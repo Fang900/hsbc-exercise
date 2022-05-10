@@ -166,14 +166,21 @@ public class UserServiceTest {
         Long role1Id = (Long) role1.getData();
         Long role2Id = (Long) role2.getData();
         List<Long> roleIds = new ArrayList<>(Arrays.asList(role1Id, role2Id));
-        BaseResult addRoleToUserResult = userService.addRoleToUser(userId, roleIds);
+        userService.addRoleToUser(userId, roleIds);
         BaseResult authenticateResult = userService.authenticateUser(userName, password);
         String token = (String) authenticateResult.getData();
         BaseResult allRoles = userService.getAllRoles(userId, token);
         Assert.assertTrue(allRoles.isSuccess());
         Assert.assertEquals(200, allRoles.getCode());
-
-        List<Role> roles = (List<Role>) allRoles.getData();
+        List<Role> roles = new ArrayList<>();
+        if(allRoles.getData() instanceof ArrayList<?>){
+            ArrayList<?> list = (ArrayList<?>)allRoles.getData();
+            for(Object obj: list){
+                if(obj instanceof Role){
+                    roles.add((Role) obj);
+                }
+            }
+        }
         Assert.assertEquals(2, roles.size());
 
     }
